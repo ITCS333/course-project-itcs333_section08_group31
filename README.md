@@ -3,8 +3,11 @@
 # ITCS333 Course Page
 
 ## The names and student IDs of all team members.
-Mohammed Abdulla Aldoseri - 202010724
+**Mohammed Abdulla Aldoseri - 202010724**
 
 ## A table indicating which student was responsible for which task.
+**Task 1:** Homepage, Admin Portal, and User Management - **Mohamed Abdulla Aldoseri**
+
+**Task 2:** Course Resources - **Mohammed Abdulla Aldoseri**
 
 ## A link to your live, hosted application on Replit.
