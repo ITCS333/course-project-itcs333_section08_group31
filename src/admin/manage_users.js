@@ -1,13 +1,10 @@
-/*
-  Requirement: Add interactivity and data management to the Admin Portal.
-
-  Instructions:
-  1. Link this file to your HTML using a <script> tag with the 'defer' attribute.
-     Example: <script src="manage_users.js" defer></script>
-  2. Implement the JavaScript functionality as described in the TODO comments.
-  3. All data management will be done by manipulating the 'students' array
-     and re-rendering the table.
-*/
+//Requirement: Add interactivity and data management to the Admin Portal.
+// Instructions:
+// 1. Link this file to your HTML using a <script> tag with the 'defer' attribute.
+// Example: <script src="manage_users.js" defer></script>
+// 2. Implement the JavaScript functionality as described in the TODO comments.
+// 3. All data management will be done by manipulating the 'students' array
+// and re-rendering the table.*/
 
 // --- Global Data Store ---
 // This array will be populated with data fetched from 'students.json'.
@@ -18,148 +15,313 @@ let students = [];
 // the HTML document is parsed before this script runs.
 
 // TODO: Select the student table body (tbody).
-
+const studentTableBody = document.getElementById("student-table-body");
 // TODO: Select the "Add Student" form.
 // (You'll need to add id="add-student-form" to this form in your HTML).
-
+const addStudentForm = document.getElementById("add-student-form");
 // TODO: Select the "Change Password" form.
 // (You'll need to add id="password-form" to this form in your HTML).
-
+const changePasswordForm = document.getElementById("password-form");
 // TODO: Select the search input field.
 // (You'll need to add id="search-input" to this input in your HTML).
-
+const searchInput = document.getElementById("search-input");
 // TODO: Select all table header (th) elements in thead.
-
+const tableHeaders = document.querySelectorAll("#student-table thead th");
 // --- Functions ---
 
 /**
- * TODO: Implement the createStudentRow function.
- * This function should take a student object {name, id, email} and return a <tr> element.
- * The <tr> should contain:
- * 1. A <td> for the student's name.
- * 2. A <td> for the student's ID.
- * 3. A <td> for the student's email.
- * 4. A <td> containing two buttons:
- * - An "Edit" button with class "edit-btn" and a data-id attribute set to the student's ID.
- * - A "Delete" button with class "delete-btn" and a data-id attribute set to the student's ID.
- */
+ * TODO: Implement the createStudentRow function.*/
 function createStudentRow(student) {
   // ... your implementation here ...
+  // * This function should take a student object {name, id, email} and return a <tr> element.
+  // * The <tr> should contain:
+    const tr = document.createElement("tr");
+  //* 1. A <td> for the student's name.
+    const nameTd = document.createElement("td");
+    nameTd.textContent = student.name;
+     tr.appendChild(nameTd);
+  // * 2. A <td> for the student's ID.
+    const idTd = document.createElement("td");
+    idTd.textContent = student.id;
+    tr.appendChild(idTd);
+  // * 3. A <td> for the student's email.
+    const emailTd = document.createElement("td");
+    emailTd.textContent = student.email;
+    tr.appendChild(emailTd);
+  // * 4. A <td> containing two buttons:
+    const actionTd = document.createElement("td");
+  // * - An "Edit" button with class "edit-btn" and a data-id attribute set to the student's ID.
+    const editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.textContent = "Edit";
+    editBtn.className = "edit-btn";
+    editBtn.dataset.id = student.id;
+
+    actionTd.appendChild(editBtn);
+  // * - A "Delete" button with class "delete-btn" and a data-id attribute set to the student's ID.
+  const deleteBtn = document.createElement("button");
+    deleteBtn.type = "button";
+    deleteBtn.textContent = "Delete";
+    deleteBtn.className = "delete-btn";
+    deleteBtn.dataset.id = student.id;
+
+    actionTd.appendChild(deleteBtn);
+
+    tr.appendChild(actionTd);
+    return tr;
 }
 
 /**
  * TODO: Implement the renderTable function.
  * This function takes an array of student objects.
- * It should:
- * 1. Clear the current content of the `studentTableBody`.
- * 2. Loop through the provided array of students.
- * 3. For each student, call `createStudentRow` and append the returned <tr> to `studentTableBody`.
- */
+ * It should:*/
 function renderTable(studentArray) {
   // ... your implementation here ...
+  // * 1. Clear the current content of the `studentTableBody`.
+  if(!studentTableBody)
+    return;
+    studentTableBody.innerHTML = "";
+  // * 2. Loop through the provided array of students.
+  studentArray.forEach(student => {
+  // * 3. For each student, call `createStudentRow` and append the returned <tr> to `studentTableBody`.
+    const tr = createStudentRow(student);
+    studentTableBody.appendChild(tr);
+  });
 }
 
 /**
  * TODO: Implement the handleChangePassword function.
  * This function will be called when the "Update Password" button is clicked.
- * It should:
- * 1. Prevent the form's default submission behavior.
- * 2. Get the values from "current-password", "new-password", and "confirm-password" inputs.
- * 3. Perform validation:
- * - If "new-password" and "confirm-password" do not match, show an alert: "Passwords do not match."
- * - If "new-password" is less than 8 characters, show an alert: "Password must be at least 8 characters."
- * 4. If validation passes, show an alert: "Password updated successfully!"
- * 5. Clear all three password input fields.
- */
+ * It should:*/
 function handleChangePassword(event) {
   // ... your implementation here ...
+  // * 1. Prevent the form's default submission behavior.
+    event.preventDefault();
+  // * 2. Get the values from "current-password", "new-password", and "confirm-password" inputs.
+    const currentPasswordInput = document.getElementById("current-password");
+    const newPasswordInput = document.getElementById("new-password");
+    const confirmPasswordInput = document.getElementById("confirm-password");
+
+    const currentPassword = currentPasswordInput.value;
+    const newPassword = newPasswordInput.value;
+    const confirmPassword = confirmPasswordInput.value;
+  // * 3. Perform validation:
+  if (newPassword !== confirmPassword) {
+  //    * - If "new-password" and "confirm-password" do not match, show an alert: "Passwords do not match."
+    alert("Passwords do not match.");
+    return;
+  }
+  //    * - If "new-password" is less than 8 characters, show an alert: "Password must be at least 8 characters."
+    if (newPassword.length < 8) {
+    alert("Password must be at least 8 characters.");
+    return;
+    }
+  // * 4. If validation passes, show an alert: "Password updated successfully!"
+    alert("Password updated successfully!");
+  // * 5. Clear all three password input fields.
+    currentPasswordInput.value = "";
+    newPasswordInput.value = "";
+    confirmPasswordInput.value = "";
 }
 
 /**
  * TODO: Implement the handleAddStudent function.
  * This function will be called when the "Add Student" button is clicked.
- * It should:
- * 1. Prevent the form's default submission behavior.
- * 2. Get the values from "student-name", "student-id", and "student-email".
- * 3. Perform validation:
- * - If any of the three fields are empty, show an alert: "Please fill out all required fields."
- * - (Optional) Check if a student with the same ID already exists in the 'students' array.
- * 4. If validation passes:
- * - Create a new student object: { name, id, email }.
- * - Add the new student object to the global 'students' array.
- * - Call `renderTable(students)` to update the view.
- * 5. Clear the "student-name", "student-id", "student-email", and "default-password" input fields.
- */
+ * It should:*/
 function handleAddStudent(event) {
   // ... your implementation here ...
+  // * 1. Prevent the form's default submission behavior.
+    event.preventDefault();
+  // * 2. Get the values from "student-name", "student-id", and "student-email".
+    const StudentnameInput = document.getElementById("student-name");
+    const StudentidInput = document.getElementById("student-id");
+    const StudentemailInput = document.getElementById("student-email");
+    const defaultPasswordInput = document.getElementById("default-password");
+
+    const name = StudentnameInput.value.trim();
+    const id = StudentidInput.value.trim();
+    const email = StudentemailInput.value.trim();
+  // * 3. Perform validation:
+    if (!name || !id || !email) {
+  // * - If any of the three fields are empty, show an alert: "Please fill out all required fields."
+        alert("Please fill out all required fields.");
+        return;
+  }
+  // * - (Optional) Check if a student with the same ID already exists in the 'students' array.
+    const existingStudent = students.some(student => student.id === id);
+    if (existingStudent) {
+  // * - If a student with the same ID exists, show an alert: "A student with this ID already exists."
+        alert("A student with this ID already exists.");
+        return;
+    }
+  // * 4. If validation passes:
+  // * - Create a new student object: { name, id, email }.
+    const newStudent = { name, id, email };
+  // * - Add the new student object to the global 'students' array.
+    students.push(newStudent);
+  // * - Call `renderTable(students)` to update the view.
+    renderTable(students);
+  // * 5. Clear the "student-name", "student-id", "student-email", and "default-password" input fields.
+    StudentnameInput.value = "";
+    StudentidInput.value = "";
+    StudentemailInput.value = "";
+    defaultPasswordInput.value = "";
 }
 
 /**
  * TODO: Implement the handleTableClick function.
  * This function will be an event listener on the `studentTableBody` (event delegation).
- * It should:
- * 1. Check if the clicked element (`event.target`) has the class "delete-btn".
- * 2. If it is a "delete-btn":
- * - Get the `data-id` attribute from the button.
- * - Update the global 'students' array by filtering out the student with the matching ID.
- * - Call `renderTable(students)` to update the view.
- * 3. (Optional) Check for "edit-btn" and implement edit logic.
- */
+ * It should:*/
 function handleTableClick(event) {
   // ... your implementation here ...
+  // * 1. Check if the clicked element (`event.target`) has the class "delete-btn".
+    const target = event.target;
+  // * 2. If it is a "delete-btn":
+    if (target.classList.contains("delete-btn")) {
+  // * - Get the `data-id` attribute from the button.
+        const studentId = target.dataset.id;
+  // * - Update the global 'students' array by filtering out the student with the matching ID.
+        students = students.filter(student => student.id !== studentId);
+  // * - Call `renderTable(students)` to update the view.
+        renderTable(students);
+        return;
+  }
+  // * 3. (Optional) Check for "edit-btn" and implement edit logic.
+    if (target.classList.contains("edit-btn")) {
+        const studentId = target.dataset.id;
+        if (!studentId) 
+            return;
+
+        const student = students.find(s => s.id === studentId);
+        if (!student)
+            return;
+        
+        const newName = prompt("Edit name:", student.name);
+        const newEmail = prompt("Edit email:", student.email);
+
+        if (newName && newEmail) {
+            student.name = newName;
+            student.email = newEmail;
+            renderTable(students);
+        }
+    }
 }
 
 /**
  * TODO: Implement the handleSearch function.
  * This function will be called on the "input" event of the `searchInput`.
- * It should:
- * 1. Get the search term from `searchInput.value` and convert it to lowercase.
- * 2. If the search term is empty, call `renderTable(students)` to show all students.
- * 3. If the search term is not empty:
- * - Filter the global 'students' array to find students whose name (lowercase)
- * includes the search term.
- * - Call `renderTable` with the *filtered array*.
- */
+ * It should:*/
 function handleSearch(event) {
   // ... your implementation here ...
+  // * 1. Get the search term from `searchInput.value` and convert it to lowercase.
+    const searchTerm = searchInput.value.toLowerCase().trim();
+  // * 2. If the search term is empty, call `renderTable(students)` to show all students.
+  if(!searchTerm) {
+    renderTable(students);
+    return;
+  }
+  // * 3. If the search term is not empty:
+  // * - Filter the global 'students' array to find students whose name (lowercase)
+  // * includes the search term.
+  const filtered = students.filter(student => 
+    student.name.toLowerCase().includes(searchTerm)
+  );
+  // * - Call `renderTable` with the *filtered array*.
+    renderTable(filtered);
 }
 
 /**
  * TODO: Implement the handleSort function.
  * This function will be called when any `th` in the `thead` is clicked.
- * It should:
- * 1. Identify which column was clicked (e.g., `event.currentTarget.cellIndex`).
- * 2. Determine the property to sort by ('name', 'id', 'email') based on the index.
- * 3. Determine the sort direction. Use a data-attribute (e.g., `data-sort-dir="asc"`) on the `th`
- * to track the current direction. Toggle between "asc" and "desc".
- * 4. Sort the global 'students' array *in place* using `array.sort()`.
- * - For 'name' and 'email', use `localeCompare` for string comparison.
- * - For 'id', compare the values as numbers.
- * 5. Respect the sort direction (ascending or descending).
- * 6. After sorting, call `renderTable(students)` to update the view.
- */
+ * It should:*/
 function handleSort(event) {
   // ... your implementation here ...
-}
+  // * 1. Identify which column was clicked (e.g., `event.currentTarget.cellIndex`).
+  const th = event.currentTarget;
+  const columnindex = th.cellIndex;
+  // * 2. Determine the property to sort by ('name', 'id', 'email') based on the index.
+    let sortBy;
+    if (columnindex === 0) {
+        sortBy = "name";
+    } else if (columnindex === 1) {
+        sortBy = "id";
+    } else if (columnindex === 2) {
+        sortBy = "email";
+    } else {
+        return;
+    }
+  // * 3. Determine the sort direction. Use a data-attribute (e.g., `data-sort-dir="asc"`) on the `th`
+  // * to track the current direction. Toggle between "asc" and "desc".
+    let sortDir = th.dataset.sortDir || "asc";
+    sortDir = sortDir === "asc" ? "desc" : "asc";
+    th.dataset.sortDir = sortDir;
+  // * 4. Sort the global 'students' array *in place* using `array.sort()`.
+  // * - For 'name' and 'email', use `localeCompare` for string comparison.
+  // * - For 'id', compare the values as numbers.
+  students.sort((a, b) => {
+        let valA = a[sortBy];
+        let valB = b[sortBy];
+
+        if (sortBy === "id") {
+            const numA = Number(valA);
+            const numB = Number(valB);
+            if (numA < numB) return sortDir === "asc" ? -1 : 1;
+            if (numA > numB) return sortDir === "asc" ? 1 : -1;
+            return 0;
+        } else {
+            const cmp = String(valA).localeCompare(String(valB));
+            return sortDir === "asc" ? cmp : -cmp;
+        }});
+  // * 5. Respect the sort direction (ascending or descending).
+  // * 6. After sorting, call `renderTable(students)` to update the view.
+    renderTable(students);
+    }
 
 /**
  * TODO: Implement the loadStudentsAndInitialize function.
  * This function needs to be 'async'.
- * It should:
- * 1. Use the `fetch()` API to get data from 'students.json'.
- * 2. Check if the response is 'ok'. If not, log an error.
- * 3. Parse the JSON response (e.g., `await response.json()`).
- * 4. Assign the resulting array to the global 'students' variable.
- * 5. Call `renderTable(students)` to populate the table for the first time.
- * 6. After data is loaded, set up all the event listeners:
- * - "submit" on `changePasswordForm` -> `handleChangePassword`
- * - "submit" on `addStudentForm` -> `handleAddStudent`
- * - "click" on `studentTableBody` -> `handleTableClick`
- * - "input" on `searchInput` -> `handleSearch`
- * - "click" on each header in `tableHeaders` -> `handleSort`
- */
+ * It should:*/
 async function loadStudentsAndInitialize() {
   // ... your implementation here ...
+  // * 1. Use the `fetch()` API to get data from 'students.json'.
+    try {
+        const response = await fetch("students.json");
+  // * 2. Check if the response is 'ok'. If not, log an error.
+        if (!response.ok) {
+            console.error("Failed to fetch students.json:");
+            students = [];
+        } else {
+  // * 3. Parse the JSON response (e.g., `await response.json()`).
+            const data = await response.json();
+  // * 4. Assign the resulting array to the global 'students' variable.
+            students = Array.isArray(data) ? data : [];}
+        } catch (error) {
+            console.error("Error fetching students.json:", error);
+            students = [];
+        }
+  // * 5. Call `renderTable(students)` to populate the table for the first time.
+    renderTable(students);
+  // * 6. After data is loaded, set up all the event listeners:
+  // * - "submit" on `changePasswordForm` -> `handleChangePassword`
+    if(changePasswordForm) {
+        changePasswordForm.addEventListener("submit", handleChangePassword);
+    }
+  // * - "submit" on `addStudentForm` -> `handleAddStudent`
+    if(addStudentForm) {
+        addStudentForm.addEventListener("submit", handleAddStudent);
+    }
+  // * - "click" on `studentTableBody` -> `handleTableClick`
+    if(studentTableBody) {
+        studentTableBody.addEventListener("click", handleTableClick);
+    }
+  // * - "input" on `searchInput` -> `handleSearch`
+    if(searchInput) {
+        searchInput.addEventListener("input", handleSearch);
+    }
+  // * - "click" on each header in `tableHeaders` -> `handleSort`
+    tableHeaders.forEach(th => {
+        th.addEventListener("click", handleSort);
+    });
 }
 
 // --- Initial Page Load ---
