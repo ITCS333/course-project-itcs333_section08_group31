@@ -10,4 +10,6 @@
 
 **Task 2:** Course Resources - **Mohammed Abdulla Aldoseri**
 
+**Task 3:** Weekly Breakdown - **Haider Ali Almualem**
+
 ## A link to your live, hosted application on Replit.
