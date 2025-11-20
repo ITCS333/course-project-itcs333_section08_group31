@@ -25,6 +25,9 @@ const emailInput = document.getElementById("email");
 const passInput = document.getElementById("password");
 // TODO: Select the message container element by its ID.
 const msgContainer = document.getElementById("message-container");
+
+//PHP end-point that handles authentication
+const LOGIN_ENDPOINT = indexLogin.php;
 // --- Functions ---
 
 /**
@@ -96,14 +99,40 @@ function handleLogin(event) {
     displayMessage("Password must be at least 8 characters.","error");
     return;
   }
+
+  try{
+    // Send data to PHP using Fetch + JSON
+    const response = await fetch(LOGIN_ENDPOINT, {
+      method: "POST", 
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({email, password})   
+    });
+    
+    const data = await response.json().catch(() => null);
+    if(!response.ok || !data || data.success == false){
+      // Server returned an error
+      const msg = (data && data.message) || "Login failed. Please check your credentials.";
+      displayMessage(msg, "error");
+      return
+    }
   // * 5. If both email and password are valid:
   // * - Call `displayMessage("Login successful!", "success")`.
   displayMessage("Login successful!","success");
   // * - (Optional) Clear the email and password input fields.
   emailInput.value = "";
   passInput.value = "";
-}
 
+  //Redirect to admin portal after a short delay
+  setTimeout(() => {
+    window.location.href = "manage_users.php";
+  }, 800);
+}
+  
+  catch(error){
+    console.error("Login request error:", error);
+    displayMessage("An error occurred while logging in. Please try again.", "error");
+  }
+}
 /**
  * TODO: Implement the setupLoginForm function.
  * This function will be called once to set up the form.*/
