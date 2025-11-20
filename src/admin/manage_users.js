@@ -10,6 +10,12 @@
 // This array will be populated with data fetched from 'students.json'.
 let students = [];
 
+// Base URL for the PHP Student Management API
+const STUDENT_API_URL = "IndexStudent_Management.php";
+
+// Endpoint for changing the ADMIN password
+const ADMIN_PASSWORD_API_URL = "Admin_change_password.php";
+
 // --- Element Selections ---
 // We can safely select elements here because 'defer' guarantees
 // the HTML document is parsed before this script runs.
@@ -93,7 +99,7 @@ function renderTable(studentArray) {
  * TODO: Implement the handleChangePassword function.
  * This function will be called when the "Update Password" button is clicked.
  * It should:*/
-function handleChangePassword(event) {
+async function handleChangePassword(event) {
   // ... your implementation here ...
   // * 1. Prevent the form's default submission behavior.
     event.preventDefault();
@@ -116,19 +122,41 @@ function handleChangePassword(event) {
     alert("Password must be at least 8 characters.");
     return;
     }
+  
+  try{
+    const response = await fetch (ADMIN_PASSWORD_API_URL,{
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        current_password = currentPassword,
+        new_password = newPassword
+      }),
+    });
+
+    const result = await response.json().catch(() => null);
+    
+    if(!response.ok || !result || result.success == false){
+      alert((result && result.message) || "Failed to update password.");
+      return;
+    }
   // * 4. If validation passes, show an alert: "Password updated successfully!"
-    alert("Password updated successfully!");
+    alert(result.message || "Password updated successfully!");
   // * 5. Clear all three password input fields.
     currentPasswordInput.value = "";
     newPasswordInput.value = "";
     confirmPasswordInput.value = "";
 }
 
+catch(error){
+  console.error("Error updating password:", error);
+  alert("An error occurred while updating the password.");
+ }
+}
 /**
  * TODO: Implement the handleAddStudent function.
  * This function will be called when the "Add Student" button is clicked.
  * It should:*/
-function handleAddStudent(event) {
+async function handleAddStudent(event) {
   // ... your implementation here ...
   // * 1. Prevent the form's default submission behavior.
     event.preventDefault();
@@ -141,6 +169,7 @@ function handleAddStudent(event) {
     const name = StudentnameInput.value.trim();
     const id = StudentidInput.value.trim();
     const email = StudentemailInput.value.trim();
+    const defaultPassword = (defaultPasswordInput.value || "").trim() || "password123";
   // * 3. Perform validation:
     if (!name || !id || !email) {
   // * - If any of the three fields are empty, show an alert: "Please fill out all required fields."
