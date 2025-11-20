@@ -4,6 +4,12 @@
    ============================================ */
 
 /* Global page background */
+/* ============================================
+   Soft Dark / Light-Dark UI Theme
+   Elegant design inspired by Darkly + custom soft grey
+   ============================================ */
+
+/* Global page background */
 body {
     background: #1e1f21;         /* soft dark */
     color: #f2f2f2;              /* light text */
@@ -80,4 +86,54 @@ a {
 a:hover {
     color: #72a7ff;
     text-decoration: underline;
+}
+.admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+}
+
+#logout-button {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+/* =========================
+   Task 2 – Course Resources
+   ========================= */
+
+/* 1) AdminView form: keep inputs/textarea neat and not too wide */
+#resource-form {
+  max-width: 600px;        /* form never wider than 600px */
+  margin: 0 auto 2rem;     /* center it */
+}
+
+#resource-form label {
+  display: block;
+  margin-top: 0.75rem;
+  font-weight: 500;
+}
+
+#resource-form input[type="text"],
+#resource-form input[type="url"],
+#resource-form textarea {
+  width: 100%;             /* fill the form width, not the whole page */
+  box-sizing: border-box;  /* padding doesn’t increase width */
+}
+
+/* Description textarea: limit height + only vertical resize */
+#resource-form textarea#resource-description {
+  min-height: 80px;
+  max-height: 200px;
+  resize: vertical;        /* user can only change height */
+}
+
+/* 2) Description text in tables & resource cards  (AdminView, List, Details) */
+#resources-table td:nth-child(2),
+#resource-list-section p,
+#resource-description {
+  max-width: 60ch;         /* comfortable reading width */
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
