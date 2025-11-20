@@ -1,11 +1,13 @@
-<!--
-  Requirement: Create a Responsive Admin Portal
+<?php
+session_start();
 
-  Instructions:
-  Fill in the HTML elements as described in the comments.
-  Use the provided IDs for the elements that require them.
-  Focus on creating a clear and semantic HTML structure.
--->
+//If the user is not logged in, send them back to the login page
+if(empty($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true){
+    header('Location: login.html');
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,11 +25,24 @@
 <body>
 
     <!-- TODO: Create a 'header' element for the top of the page. -->
-     <header>
+     <header class="admin-header">
         <!-- TODO: Inside the header, add a main heading (e.g., 'h1') with the text "Admin Portal". -->
+         <div class="header-left">
          <h1>
             Admin Portal
          </h1>
+        </div>
+
+    <!--Small header area on the right for the Logout button -->
+        <div class= "header-right">
+
+             <!-- Logout goes to logout.php and uses POST for the better security -->
+              <form action= "logout.php" method="post">
+                <button type="submit" id="logout-button">
+                    Logout
+                </button>
+            </form>
+        </div> 
     <!-- End of the header. -->
      </header>
     <!-- TODO: Create a 'main' element to hold the primary content of the portal. -->
@@ -40,7 +55,7 @@
                     Change Your Password
                 </h2>
             <!-- TODO: Create a 'form' for changing the password. The 'action' can be '#'. -->
-                <form action="#" id="password-form">
+                <form action="#" id="password-form" method="post">
                 <!-- TODO: Use a 'fieldset' to group the password-related fields. -->
                     <fieldset>
                     <!-- TODO: Add a 'legend' for the fieldset, e.g., "Password Update". -->
@@ -105,7 +120,7 @@
                         Add New Student
                     </summary>
                 <!-- TODO: Create a 'form' for adding a new student. 'action' can be '#'. -->
-                    <form action="#" id="add-student-form">
+                    <form action="#" id="add-student-form" method="post">
                     <!-- TODO: Use a 'fieldset' to group the new student fields. -->
                         <fieldset>
                         <!-- TODO: Add a 'legend' for the fieldset, e.g., "New Student Information". -->
