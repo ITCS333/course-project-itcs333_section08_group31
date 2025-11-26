@@ -1,65 +1,104 @@
 <!--
-  Requirement: Create the Dedicated Page for a Single Assignment
+  Requirement: Create the Dedicated Page for a Single Resource
 
   Instructions:
-  This page displays the full details for one assignment and allows for discussion.
+  This page displays the details for one resource and allows for discussion.
 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <!-- TODO: Add meta tags for charset and viewport. -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- TODO: Add a title, for now use "Assignment Details". -->
+    <!-- TODO: Add a title. You can make it dynamic later, but for now, use "Resource Details". -->
+    <title>Resource Details</title>
 
     <!-- TODO: Link to your CSS framework or stylesheet. -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- TODO: Create a 'header' with a main heading ('h1'). Use a dummy title like "Assignment 1: HTML Basics". -->
+    <!-- TODO: Create a 'header' with a main heading ('h1'). You can use a dummy title like "Chapter 1 Notes". -->
+    <header>
+        <h1 id="resource-title">Resource Title</h1>
+    </header>
 
     <!-- TODO: Create the 'main' content area. -->
+    <main>
 
-        <!-- Section 1: Assignment Information -->
-        <!-- TODO: Use an 'article' to display the main assignment information. -->
-            <!-- TODO: Add a paragraph ('p') to display the due date, e.g., "Due: YYYY-MM-DD". -->
-            <!-- TODO: Add a sub-heading ('h2') "Description". -->
-            <!-- TODO: Add a paragraph ('p') with dummy text for the assignment's detailed description. -->
-
-            <!-- TODO: Add another sub-heading ('h2') "Attached Files & Links". -->
-            <!-- TODO: Use an unordered list ('ul') to display the links. -->
-                <!-- TODO: Add list items ('li') with anchor tags ('a') for each resource. Use dummy links for now. -->
-                <!-- Example: <li><a href="#">assignment-brief.pdf</a></li> -->
-            <!-- End of the list. -->
+        <!-- Section 1: Resource Information -->
+        <!-- TODO: Use an 'article' to display the main resource information. -->
+        <article>
+            <!-- TODO: Add a paragraph ('p') for the resource description (use dummy text). -->
+            <p id="resource-description">
+                This is a placeholder description for the selected resource.
+            </p>
+            <!-- TODO: Add an anchor tag ('a') that links to the actual resource URL (use a dummy link like "https://example.com").
+                 - Text should be "Access Resource Material".
+                 - Consider adding 'target="_blank"' to open it in a new tab. -->
+            <a id="resource-link" href="https://example.com" target="_blank">
+                Access Resource Material
+            </a>
         <!-- End of article. -->
+        </article>
 
         <!-- Section 2: Discussion Forum -->
         <!-- TODO: Create a 'section' for the discussion, with an 'id' of "discussion-forum". -->
-            <!-- TODO: Add a sub-heading ('h2') "Questions & Discussion". -->
+        <section id="discussion-forum">
+            <!-- TODO: Add a sub-heading ('h2') "Discussion". -->
+            <h2>Discussion</h2>
 
             <!-- Subsection 2.1: Existing Comments -->
             <!-- TODO: Add a container (like a 'div') for the list of comments. -->
+            <div id="comment-list">
                 <!-- TODO: Add 1-2 dummy comments to show the structure. -->
 
                 <!-- Example Comment 1: -->
                 <!-- TODO: Use an 'article' for each comment. -->
-                    <!-- TODO: Use a 'p' for the comment text (e.g., "Is it okay to use a 'section' inside an 'article'?"). -->
-                    <!-- TODO: Use a 'footer' to show the author (e.g., "Posted by: Jane Smith"). -->
+                <article>
+                    <!-- TODO: Use a 'p' for the comment text (e.g., "This was very helpful, thanks!"). -->
+                    <p>This was very helpful, thanks!</p>
+                    <!-- TODO: Use a 'footer' to show the author (e.g., "Posted by: Jane Doe"). -->
+                    <footer>Posted by: Jane Doe</footer>
                 <!-- End of comment article. -->
+                </article>
+
+                <!-- Example Comment 2: -->
+                <!-- TODO: Create another 'article' for a second comment. -->
+                <article>
+                    <p>Can someone explain slide 5 in more detail?</p>
+                    <footer>Posted by: Ahmed</footer>
+                </article>
+            <!-- End of comment list container. -->
+            </div>
 
             <!-- Subsection 2.2: Add a Comment Form -->
             <!-- TODO: Create a 'form' for users to post new comments. Action can be '#'. -->
+            <form id="comment-form" action="#" method="post">
                 <!-- TODO: Use a 'fieldset' to group the controls. -->
-                    <!-- TODO: Add a 'legend', e.g., "Ask a Question". -->
+                <fieldset>
+                    <!-- TODO: Add a 'legend', e.g., "Leave a Comment". -->
+                    <legend>Leave a Comment</legend>
 
                     <!-- TODO: Add a 'label' and 'textarea' for the comment box.
                          - label 'for': "new-comment"
                          - textarea 'id': "new-comment", required -->
+                    <label for="new-comment">Your Comment</label>
+                    <textarea id="new-comment" rows="4" required></textarea>
                     
                     <!-- TODO: Add a 'button' to submit the comment.
                          - type="submit", Text: "Post Comment" -->
+                    <button type="submit">Post Comment</button>
                 <!-- End of fieldset. -->
+                </fieldset>
             <!-- End of form. -->
+            </form>
         <!-- End of discussion section. -->
+        </section>
 
     <!-- End of main. -->
+    </main>
+
+    <script src="details.js" defer></script>
 </body>
 </html>

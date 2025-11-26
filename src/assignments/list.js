@@ -1,47 +1,95 @@
 /*
-  Requirement: Populate the "Course Assignments" list page.
+  Requirement: Populate the "Course Resources" list page.
 
   Instructions:
   1. Link this file to `list.html` using:
      <script src="list.js" defer></script>
 
-  2. In `list.html`, add an `id="assignment-list-section"` to the
-     <section> element that will contain the assignment articles.
+  2. In `list.html`, add an `id="resource-list-section"` to the
+     <section> element that will contain the resource articles.
 
   3. Implement the TODOs below.
 */
 
 // --- Element Selections ---
-// TODO: Select the section for the assignment list ('#assignment-list-section').
+// TODO: Select the section for the resource list ('#resource-list-section').
+const listSection = document.getElementById("resource-list-section");
 
 // --- Functions ---
 
 /**
- * TODO: Implement the createAssignmentArticle function.
- * It takes one assignment object {id, title, dueDate, description}.
+ * TODO: Implement the createResourceArticle function.
+ * It takes one resource object {id, title, description}.
  * It should return an <article> element matching the structure in `list.html`.
- * The "View Details" link's `href` MUST be set to `details.html?id=${id}`.
- * This is how the detail page will know which assignment to load.
+ * The "View Resource & Discussion" link's `href` MUST be set to `details.html?id=${id}`.
+ * (This is how the detail page will know which resource to load).
  */
-function createAssignmentArticle(assignment) {
+function createResourceArticle(resource) {
   // ... your implementation here ...
+  const article = document.createElement("article");
+
+  const heading = document.createElement("h2");
+  heading.textContent = resource.title;
+  article.appendChild(heading);
+
+  const descPara = document.createElement("p");
+  descPara.textContent = resource.description || "";
+  article.appendChild(descPara);
+
+  const link = document.createElement("a");
+  // Note: file name uses capital D because your file is "Details.html"
+  link.href = `Details.html?id=${encodeURIComponent(resource.id)}`;
+  link.textContent = "View Resource & Discussion";
+  article.appendChild(link);
+
+  return article;
 }
 
 /**
- * TODO: Implement the loadAssignments function.
+ * TODO: Implement the loadResources function.
  * This function needs to be 'async'.
  * It should:
- * 1. Use `fetch()` to get data from 'assignments.json'.
+ * 1. Use `fetch()` to get data from 'resources.json'.
  * 2. Parse the JSON response into an array.
  * 3. Clear any existing content from `listSection`.
- * 4. Loop through the assignments array. For each assignment:
- * - Call `createAssignmentArticle()`.
+ * 4. Loop through the resources array. For each resource:
+ * - Call `createResourceArticle()`.
  * - Append the returned <article> element to `listSection`.
  */
-async function loadAssignments() {
+async function loadResources() {
   // ... your implementation here ...
+  if (!listSection) return;
+
+  try {
+    const response = await fetch("resources.json");
+    if (!response.ok) {
+      console.error(
+        "Failed to load resources.json:",
+        response.status,
+        response.statusText
+      );
+      return;
+    }
+
+    const data = await response.json().catch(() => null);
+    if (!Array.isArray(data)) {
+      console.error("resources.json is not an array:", data);
+      return;
+    }
+
+    // 3. Clear existing content
+    listSection.innerHTML = "";
+
+    // 4. Loop and append
+    data.forEach((resource) => {
+      const article = createResourceArticle(resource);
+      listSection.appendChild(article);
+    });
+  } catch (error) {
+    console.error("Error loading resources:", error);
+  }
 }
 
 // --- Initial Page Load ---
 // Call the function to populate the page.
-loadAssignments();
+loadResources();
