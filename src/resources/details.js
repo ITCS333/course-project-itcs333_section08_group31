@@ -23,6 +23,12 @@ let currentComments = [];
 
 // --- Element Selections ---
 // TODO: Select all the elements you added IDs for in step 2.
+const resourceTitle = document.getElementById("resource-title");
+const resourceDescription = document.getElementById("resource-description");
+const resourceLink = document.getElementById("resource-link");
+const commentList = document.getElementById("comment-list");
+const commentForm = document.getElementById("comment-form");
+const newComment = document.getElementById("new-comment");
 
 // --- Functions ---
 
@@ -35,6 +41,8 @@ let currentComments = [];
  */
 function getResourceIdFromURL() {
   // ... your implementation here ...
+  const params = new URLSearchParams(window.location.search);
+  return params.get("id");
 }
 
 /**
@@ -47,6 +55,17 @@ function getResourceIdFromURL() {
  */
 function renderResourceDetails(resource) {
   // ... your implementation here ...
+  if (!resource) return;
+
+  if (resourceTitle) {
+    resourceTitle.textContent = resource.title || "Resource Details";
+  }
+  if (resourceDescription) {
+    resourceDescription.textContent = resource.description || "";
+  }
+  if (resourceLink) {
+    resourceLink.href = resource.link || "#";
+  }
 }
 
 /**
@@ -57,6 +76,17 @@ function renderResourceDetails(resource) {
  */
 function createCommentArticle(comment) {
   // ... your implementation here ...
+  const article = document.createElement("article");
+
+  const p = document.createElement("p");
+  p.textContent = comment.text || "";
+  article.appendChild(p);
+
+  const footer = document.createElement("footer");
+  footer.textContent = `Posted by: ${comment.author || "Student"}`;
+  article.appendChild(footer);
+
+  return article;
 }
 
 /**
@@ -69,6 +99,16 @@ function createCommentArticle(comment) {
  */
 function renderComments() {
   // ... your implementation here ...
+  if (!commentList) return;
+
+  // 1. Clear existing comments
+  commentList.innerHTML = "";
+
+  // 2 & 3. Loop and append
+  currentComments.forEach((comment) => {
+    const article = createCommentArticle(comment);
+    commentList.appendChild(article);
+  });
 }
 
 /**
@@ -86,6 +126,23 @@ function renderComments() {
  */
 function handleAddComment(event) {
   // ... your implementation here ...
+  event.preventDefault();
+
+  if (!newComment) return;
+
+  const commentText = newComment.value.trim();
+  if (!commentText) {
+    return;
+  }
+
+  const newCommentObj = {
+    author: "Student",
+    text: commentText,
+  };
+
+  currentComments.push(newCommentObj);
+  renderComments();
+  newComment.value = "";
 }
 
 /**
@@ -107,6 +164,76 @@ function handleAddComment(event) {
  */
 async function initializePage() {
   // ... your implementation here ...
+  currentResourceId = getResourceIdFromURL();
+
+  if (!currentResourceId) {
+    if (resourceTitle) {
+      resourceTitle.textContent = "Resource not found.";
+    }
+    return;
+  }
+
+  try {
+    // Using 'resources.json' and 'comments.json'
+    const [resourcesResp, commentsResp] = await Promise.all([
+      fetch("resources.json"),
+      fetch("comments.json"),
+    ]);
+
+    if (!resourcesResp.ok || !commentsResp.ok) {
+      console.error(
+        "Failed to load resources or comments JSON:",
+        resourcesResp.status,
+        commentsResp.status
+      );
+      if (resourceTitle) {
+        resourceTitle.textContent = "Error loading resource data.";
+      }
+      return;
+    }
+
+    const resourcesData = await resourcesResp.json().catch(() => null);
+    const commentsData = await commentsResp.json().catch(() => null);
+
+    if (!Array.isArray(resourcesData) || typeof commentsData !== "object") {
+      console.error("Invalid JSON format for resources or comments.");
+      if (resourceTitle) {
+        resourceTitle.textContent = "Error loading resource data.";
+      }
+      return;
+    }
+
+    // 5. Find the correct resource
+    const resource = resourcesData.find(
+      (r) => String(r.id) === String(currentResourceId)
+    );
+
+    if (!resource) {
+      if (resourceTitle) {
+        resourceTitle.textContent = "Resource not found.";
+      }
+      return;
+    }
+
+    // 6. Get comments for this resource ID
+    const commentsForResource = commentsData[currentResourceId];
+    currentComments = Array.isArray(commentsForResource)
+      ? commentsForResource
+      : [];
+
+    // 7. Render details and comments, add listener
+    renderResourceDetails(resource);
+    renderComments();
+
+    if (commentForm) {
+      commentForm.addEventListener("submit", handleAddComment);
+    }
+  } catch (error) {
+    console.error("Error initializing resource details page:", error);
+    if (resourceTitle) {
+      resourceTitle.textContent = "Error loading resource data.";
+    }
+  }
 }
 
 // --- Initial Page Load ---

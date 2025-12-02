@@ -13,6 +13,7 @@
 
 // --- Element Selections ---
 // TODO: Select the section for the resource list ('#resource-list-section').
+const listSection = document.getElementById("resource-list-section");
 
 // --- Functions ---
 
@@ -25,6 +26,23 @@
  */
 function createResourceArticle(resource) {
   // ... your implementation here ...
+  const article = document.createElement("article");
+
+  const heading = document.createElement("h2");
+  heading.textContent = resource.title;
+  article.appendChild(heading);
+
+  const descPara = document.createElement("p");
+  descPara.textContent = resource.description || "";
+  article.appendChild(descPara);
+
+  const link = document.createElement("a");
+  // Note: file name uses capital D because your file is "Details.html"
+  link.href = `Details.html?id=${encodeURIComponent(resource.id)}`;
+  link.textContent = "View Resource & Discussion";
+  article.appendChild(link);
+
+  return article;
 }
 
 /**
@@ -40,6 +58,36 @@ function createResourceArticle(resource) {
  */
 async function loadResources() {
   // ... your implementation here ...
+  if (!listSection) return;
+
+  try {
+    const response = await fetch("resources.json");
+    if (!response.ok) {
+      console.error(
+        "Failed to load resources.json:",
+        response.status,
+        response.statusText
+      );
+      return;
+    }
+
+    const data = await response.json().catch(() => null);
+    if (!Array.isArray(data)) {
+      console.error("resources.json is not an array:", data);
+      return;
+    }
+
+    // 3. Clear existing content
+    listSection.innerHTML = "";
+
+    // 4. Loop and append
+    data.forEach((resource) => {
+      const article = createResourceArticle(resource);
+      listSection.appendChild(article);
+    });
+  } catch (error) {
+    console.error("Error loading resources:", error);
+  }
 }
 
 // --- Initial Page Load ---
