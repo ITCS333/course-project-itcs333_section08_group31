@@ -38,7 +38,7 @@ function createResourceArticle(resource) {
 
   const link = document.createElement("a");
   // Note: file name uses capital D because your file is "Details.html"
-  link.href = `Details.html?id=${encodeURIComponent(resource.id)}`;
+  link.href = `details.html?id=${encodeURIComponent(resource.id)}`;
   link.textContent = "View Resource & Discussion";
   article.appendChild(link);
 
