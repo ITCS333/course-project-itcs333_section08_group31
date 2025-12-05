@@ -1,63 +1,23 @@
-<!--
-  Requirement: Create the Student View for Course Resources
-
-  Instructions:
-  This page is a read-only view for students to see all available course materials.
-  Each resource should link to a dedicated detail page.
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- TODO: Add meta tags for charset and viewport. -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- TODO: Add a title, e.g., "Course Resources". -->
-    <title>Course Resources</title>
-
-    <!-- TODO: Link to your CSS framework or stylesheet. -->
-    <link rel="stylesheet" href="styles.css">
+    <title>Course Assignments</title>
+    <link rel="stylesheet" href="../common/styles.css">
 </head>
 <body>
 
-    <!-- TODO: Create a 'header' with a main heading ('h1') "Course Resources". -->
     <header>
-        <h1>Course Resources</h1>
+        <h1>Course Assignments</h1>
     </header>
 
-    <!-- TODO: Create the 'main' content area. -->
     <main>
-        <!-- TODO: Create a 'section' to contain the list of resources. -->
-        <section id="resource-list-section">
-            <!-- TODO: Add 2-3 dummy resources using the structure below. -->
-
-            <!-- Example Resource 1: -->
-            <!-- TODO: Use an 'article' element for each resource to group its content semantically. -->
-            <article>
-                <!-- TODO: Add a heading ('h2' or 'h3') for the resource title (e.g., "Chapter 1 Notes"). -->
-                <h2>Chapter 1 Notes</h2>
-                <!-- TODO: Add a paragraph ('p') for the resource description. -->
-                <p>PDF notes covering introduction to HTML and CSS.</p>
-                <!-- TODO: Add an anchor tag ('a') that links to the detail page. 
-                     - For now, the 'href' can be "resource-detail.html".
-                     - The link text should be "View Resource & Discussion". -->
-                <a href="Details.html?id=dummy1">View Resource &amp; Discussion</a>
-            </article>
-
-            <!-- Example Resource 2: -->
-            <!-- TODO: Create a second 'article' for another resource. -->
-            <article>
-                <!-- TODO: Add a heading, paragraph, and an anchor tag linking to "resource-detail.html". -->
-                <h2>MDN HTML Guide</h2>
-                <p>External link to MDN HTML reference documentation.</p>
-                <a href="Details.html?id=dummy2">View Resource &amp; Discussion</a>
-            </article>
-
-        <!-- End of resource list section. -->
+        <section id="assignment-list">
+            <p>Loading assignments...</p>
         </section>
-    <!-- End of main. -->
     </main>
 
-    <script src="List.js" defer></script>
+    <script src="list.js" defer></script>
 </body>
 </html>
