@@ -1,95 +1,81 @@
 /*
-  Requirement: Populate the "Course Resources" list page.
-
-  Instructions:
-  1. Link this file to `list.html` using:
-     <script src="list.js" defer></script>
-
-  2. In `list.html`, add an `id="resource-list-section"` to the
-     <section> element that will contain the resource articles.
-
-  3. Implement the TODOs below.
+  Requirement: Populate the "Course Assignments" list page.
+  Structure matches src/resources/list.js
 */
 
 // --- Element Selections ---
-// TODO: Select the section for the resource list ('#resource-list-section').
-const listSection = document.getElementById("resource-list-section");
+const listSection = document.getElementById("assignment-list");
+const API_URL = "api/indexCourse_Resources.php";
 
 // --- Functions ---
 
 /**
- * TODO: Implement the createResourceArticle function.
- * It takes one resource object {id, title, description}.
- * It should return an <article> element matching the structure in `list.html`.
- * The "View Resource & Discussion" link's `href` MUST be set to `details.html?id=${id}`.
- * (This is how the detail page will know which resource to load).
+ * Creates an article element for a single assignment.
+ * Matches structure of createResourceArticle in resources/list.js
  */
-function createResourceArticle(resource) {
-  // ... your implementation here ...
+function createAssignmentArticle(assignment) {
   const article = document.createElement("article");
 
+  // Title
   const heading = document.createElement("h2");
-  heading.textContent = resource.title;
+  heading.textContent = assignment.title;
   article.appendChild(heading);
 
+  // Due Date (Specific to Assignments)
+  const duePara = document.createElement("p");
+  duePara.innerHTML = `<strong>Due Date:</strong> ${assignment.due_date}`;
+  article.appendChild(duePara);
+
+  // Description
   const descPara = document.createElement("p");
-  descPara.textContent = resource.description || "";
+  // Truncate description for the list view if it's too long
+  const descText = assignment.description || "";
+  descPara.textContent = descText.length > 100 ? descText.substring(0, 100) + "..." : descText;
   article.appendChild(descPara);
 
+  // Link
   const link = document.createElement("a");
-  // Note: file name uses capital D because your file is "Details.html"
-  link.href = `Details.html?id=${encodeURIComponent(resource.id)}`;
-  link.textContent = "View Resource & Discussion";
+  link.href = `details.html?id=${assignment.id}`;
+  link.textContent = "View Details & Submit";
   article.appendChild(link);
 
   return article;
 }
 
 /**
- * TODO: Implement the loadResources function.
- * This function needs to be 'async'.
- * It should:
- * 1. Use `fetch()` to get data from 'resources.json'.
- * 2. Parse the JSON response into an array.
- * 3. Clear any existing content from `listSection`.
- * 4. Loop through the resources array. For each resource:
- * - Call `createResourceArticle()`.
- * - Append the returned <article> element to `listSection`.
+ * Fetches assignments from the API and populates the list.
+ * Matches structure of loadResources in resources/list.js
  */
-async function loadResources() {
-  // ... your implementation here ...
+async function loadAssignments() {
   if (!listSection) return;
 
   try {
-    const response = await fetch("resources.json");
-    if (!response.ok) {
-      console.error(
-        "Failed to load resources.json:",
-        response.status,
-        response.statusText
-      );
-      return;
-    }
+    const response = await fetch(API_URL);
+    const result = await response.json();
 
-    const data = await response.json().catch(() => null);
-    if (!Array.isArray(data)) {
-      console.error("resources.json is not an array:", data);
-      return;
-    }
-
-    // 3. Clear existing content
+    // Clear existing content
     listSection.innerHTML = "";
 
-    // 4. Loop and append
-    data.forEach((resource) => {
-      const article = createResourceArticle(resource);
-      listSection.appendChild(article);
-    });
+    if (result.success && Array.isArray(result.data)) {
+        // Loop and append
+        result.data.forEach((asg) => {
+            const article = createAssignmentArticle(asg);
+            listSection.appendChild(article);
+        });
+        
+        if (result.data.length === 0) {
+            listSection.innerHTML = "<p>No assignments available.</p>";
+        }
+    } else {
+        console.error("Failed to load assignments or invalid data format.");
+        listSection.innerHTML = "<p>Error loading assignments.</p>";
+    }
+
   } catch (error) {
-    console.error("Error loading resources:", error);
+    console.error("Error fetching assignments:", error);
+    listSection.innerHTML = "<p>Error loading assignments.</p>";
   }
 }
 
 // --- Initial Page Load ---
-// Call the function to populate the page.
-loadResources();
+loadAssignments();
