@@ -1,31 +1,18 @@
 /*
-  Requirement: Populate the resource detail page and discussion forum.
-
-  Instructions:
-  1. Link this file to `details.html` using:
-     <script src="details.js" defer></script>
-
-  2. In `details.html`, add the following IDs:
-     - To the <h1>: `id="resource-title"`
-     - To the description <p>: `id="resource-description"`
-     - To the "Access Resource Material" <a> tag: `id="resource-link"`
-     - To the <div> for comments: `id="comment-list"`
-     - To the "Leave a Comment" <form>: `id="comment-form"`
-     - To the <textarea>: `id="new-comment"`
-
-  3. Implement the TODOs below.
+  Requirement: Populate the assignment detail page and discussion forum.
+  Structure matches src/resources/details.js
 */
 
 // --- Global Data Store ---
-// These will hold the data related to *this* resource.
-let currentResourceId = null;
+let currentAssignmentId = null;
 let currentComments = [];
+const API_URL = "api/indexCourse_Resources.php";
 
 // --- Element Selections ---
-// TODO: Select all the elements you added IDs for in step 2.
-const resourceTitle = document.getElementById("resource-title");
-const resourceDescription = document.getElementById("resource-description");
-const resourceLink = document.getElementById("resource-link");
+const assignmentTitle = document.getElementById("asg-title");
+const assignmentDescription = document.getElementById("asg-desc");
+const assignmentDueDate = document.getElementById("asg-due");
+const assignmentFilesList = document.getElementById("asg-files");
 const commentList = document.getElementById("comment-list");
 const commentForm = document.getElementById("comment-form");
 const newComment = document.getElementById("new-comment");
@@ -33,49 +20,56 @@ const newComment = document.getElementById("new-comment");
 // --- Functions ---
 
 /**
- * TODO: Implement the getResourceIdFromURL function.
- * It should:
- * 1. Get the query string from `window.location.search`.
- * 2. Use the `URLSearchParams` object to get the value of the 'id' parameter.
- * 3. Return the id.
+ * Helper to get ID from URL.
+ * Matches getResourceIdFromURL in resources/details.js
  */
-function getResourceIdFromURL() {
-  // ... your implementation here ...
+function getAssignmentIdFromURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get("id");
 }
 
 /**
- * TODO: Implement the renderResourceDetails function.
- * It takes one resource object.
- * It should:
- * 1. Set the `textContent` of `resourceTitle` to the resource's title.
- * 2. Set the `textContent` of `resourceDescription` to the resource's description.
- * 3. Set the `href` attribute of `resourceLink` to the resource's link.
+ * Renders the assignment details.
+ * Matches renderResourceDetails, but handles Due Date and File List.
  */
-function renderResourceDetails(resource) {
-  // ... your implementation here ...
-  if (!resource) return;
+function renderAssignmentDetails(assignment) {
+  if (!assignment) return;
 
-  if (resourceTitle) {
-    resourceTitle.textContent = resource.title || "Resource Details";
+  if (assignmentTitle) {
+    assignmentTitle.textContent = assignment.title || "Assignment Details";
   }
-  if (resourceDescription) {
-    resourceDescription.textContent = resource.description || "";
+  if (assignmentDescription) {
+    assignmentDescription.textContent = assignment.description || "";
   }
-  if (resourceLink) {
-    resourceLink.href = resource.link || "#";
+  if (assignmentDueDate) {
+    assignmentDueDate.textContent = assignment.due_date || "No Date";
+  }
+
+  // Handle Files List (Specific to Assignments)
+  if (assignmentFilesList) {
+    assignmentFilesList.innerHTML = ""; // Clear existing
+    if (Array.isArray(assignment.files) && assignment.files.length > 0) {
+      assignment.files.forEach(fileName => {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = "#"; // Placeholder, or path to file download
+        a.textContent = fileName;
+        li.appendChild(a);
+        assignmentFilesList.appendChild(li);
+      });
+    } else {
+        const li = document.createElement("li");
+        li.textContent = "No files attached.";
+        assignmentFilesList.appendChild(li);
+    }
   }
 }
 
 /**
- * TODO: Implement the createCommentArticle function.
- * It takes one comment object {author, text}.
- * It should return an <article> element matching the structure in `details.html`.
- * (e.g., an <article> containing a <p> and a <footer>).
+ * Creates HTML for a single comment.
+ * Matches createCommentArticle in resources/details.js
  */
 function createCommentArticle(comment) {
-  // ... your implementation here ...
   const article = document.createElement("article");
 
   const p = document.createElement("p");
@@ -83,28 +77,21 @@ function createCommentArticle(comment) {
   article.appendChild(p);
 
   const footer = document.createElement("footer");
-  footer.textContent = `Posted by: ${comment.author || "Student"}`;
+  footer.textContent = `Posted by: ${comment.author || "Student"} on ${comment.created_at || "Recent"}`;
   article.appendChild(footer);
 
   return article;
 }
 
 /**
- * TODO: Implement the renderComments function.
- * It should:
- * 1. Clear the `commentList`.
- * 2. Loop through the global `currentComments` array.
- * 3. For each comment, call `createCommentArticle()`, and
- * append the resulting <article> to `commentList`.
+ * Renders the list of comments.
+ * Matches renderComments in resources/details.js
  */
 function renderComments() {
-  // ... your implementation here ...
   if (!commentList) return;
 
-  // 1. Clear existing comments
   commentList.innerHTML = "";
 
-  // 2 & 3. Loop and append
   currentComments.forEach((comment) => {
     const article = createCommentArticle(comment);
     commentList.appendChild(article);
@@ -112,127 +99,96 @@ function renderComments() {
 }
 
 /**
- * TODO: Implement the handleAddComment function.
- * This is the event handler for the `commentForm` 'submit' event.
- * It should:
- * 1. Prevent the form's default submission.
- * 2. Get the text from `newComment.value`.
- * 3. If the text is empty, return.
- * 4. Create a new comment object: { author: 'Student', text: commentText }
- * (For this exercise, 'Student' is a fine hardcoded author).
- * 5. Add the new comment to the global `currentComments` array (in-memory only).
- * 6. Call `renderComments()` to refresh the list.
- * 7. Clear the `newComment` textarea.
+ * Handles posting a new comment.
+ * Matches handleAddComment in resources/details.js, but uses API.
  */
-function handleAddComment(event) {
-  // ... your implementation here ...
+async function handleAddComment(event) {
   event.preventDefault();
 
   if (!newComment) return;
 
-  const commentText = newComment.value.trim();
-  if (!commentText) {
-    return;
+  const text = newComment.value.trim();
+  if (!text) return;
+
+  try {
+    const response = await fetch(`${API_URL}?action=comment`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        assignment_id: currentAssignmentId,
+        author: "Student", // In a real app, this comes from the session
+        text: text
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Reload comments to show the new one with server timestamp
+      await loadCommentsOnly(); 
+      newComment.value = "";
+    } else {
+      alert("Failed to post comment");
+    }
+  } catch (error) {
+    console.error("Error posting comment:", error);
   }
-
-  const newCommentObj = {
-    author: "Student",
-    text: commentText,
-  };
-
-  currentComments.push(newCommentObj);
-  renderComments();
-  newComment.value = "";
 }
 
 /**
- * TODO: Implement an `initializePage` function.
- * This function needs to be 'async'.
- * It should:
- * 1. Get the `currentResourceId` by calling `getResourceIdFromURL()`.
- * 2. If no ID is found, set `resourceTitle.textContent = "Resource not found."` and stop.
- * 3. `fetch` both 'resources.json' and 'resource-comments.json' (you can use `Promise.all`).
- * 4. Parse both JSON responses.
- * 5. Find the correct resource from the resources array using the `currentResourceId`.
- * 6. Get the correct comments array from the comments object using the `currentResourceId`.
- * Store this in the global `currentComments` variable. (If no comments exist, use an empty array).
- * 7. If the resource is found:
- * - Call `renderResourceDetails()` with the resource object.
- * - Call `renderComments()` to show the initial comments.
- * - Add the 'submit' event listener to `commentForm` (calls `handleAddComment`).
- * 8. If the resource is not found, display an error in `resourceTitle`.
+ * Helper to fetch just comments (used after posting).
+ */
+async function loadCommentsOnly() {
+    if (!currentAssignmentId) return;
+    try {
+        const res = await fetch(`${API_URL}?action=comments&assignment_id=${currentAssignmentId}`);
+        const result = await res.json();
+        if (result.success && Array.isArray(result.data)) {
+            currentComments = result.data;
+            renderComments();
+        }
+    } catch(e) { console.error(e); }
+}
+
+/**
+ * Main initialization function.
+ * Matches initializePage in resources/details.js
  */
 async function initializePage() {
-  // ... your implementation here ...
-  currentResourceId = getResourceIdFromURL();
+  currentAssignmentId = getAssignmentIdFromURL();
 
-  if (!currentResourceId) {
-    if (resourceTitle) {
-      resourceTitle.textContent = "Resource not found.";
-    }
+  if (!currentAssignmentId) {
+    if (assignmentTitle) assignmentTitle.textContent = "Assignment not found.";
     return;
   }
 
   try {
-    // Using 'resources.json' and 'comments.json'
-    const [resourcesResp, commentsResp] = await Promise.all([
-      fetch("resources.json"),
-      fetch("comments.json"),
-    ]);
+    // Fetch Assignment Details
+    const asgRes = await fetch(`${API_URL}?id=${currentAssignmentId}`);
+    const asgResult = await asgRes.json();
 
-    if (!resourcesResp.ok || !commentsResp.ok) {
-      console.error(
-        "Failed to load resources or comments JSON:",
-        resourcesResp.status,
-        commentsResp.status
-      );
-      if (resourceTitle) {
-        resourceTitle.textContent = "Error loading resource data.";
-      }
-      return;
+    // Fetch Comments
+    const commentsRes = await fetch(`${API_URL}?action=comments&assignment_id=${currentAssignmentId}`);
+    const commentsResult = await commentsRes.json();
+
+    if (asgResult.success) {
+        renderAssignmentDetails(asgResult.data);
+    } else {
+        if (assignmentTitle) assignmentTitle.textContent = "Assignment not found.";
     }
 
-    const resourcesData = await resourcesResp.json().catch(() => null);
-    const commentsData = await commentsResp.json().catch(() => null);
-
-    if (!Array.isArray(resourcesData) || typeof commentsData !== "object") {
-      console.error("Invalid JSON format for resources or comments.");
-      if (resourceTitle) {
-        resourceTitle.textContent = "Error loading resource data.";
-      }
-      return;
+    if (commentsResult.success && Array.isArray(commentsResult.data)) {
+        currentComments = commentsResult.data;
+        renderComments();
     }
-
-    // 5. Find the correct resource
-    const resource = resourcesData.find(
-      (r) => String(r.id) === String(currentResourceId)
-    );
-
-    if (!resource) {
-      if (resourceTitle) {
-        resourceTitle.textContent = "Resource not found.";
-      }
-      return;
-    }
-
-    // 6. Get comments for this resource ID
-    const commentsForResource = commentsData[currentResourceId];
-    currentComments = Array.isArray(commentsForResource)
-      ? commentsForResource
-      : [];
-
-    // 7. Render details and comments, add listener
-    renderResourceDetails(resource);
-    renderComments();
 
     if (commentForm) {
       commentForm.addEventListener("submit", handleAddComment);
     }
+
   } catch (error) {
-    console.error("Error initializing resource details page:", error);
-    if (resourceTitle) {
-      resourceTitle.textContent = "Error loading resource data.";
-    }
+    console.error("Error initializing page:", error);
+    if (assignmentTitle) assignmentTitle.textContent = "Error loading data.";
   }
 }
 
