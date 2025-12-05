@@ -1,134 +1,157 @@
 /*
   Requirement: Populate the single topic page and manage replies.
 
-  Instructions:
-  1. Link this file to `topic.html` using:
-     <script src="topic.js" defer></script>
-
-  2. In `topic.html`, add the following IDs:
-     - To the <h1>: `id="topic-subject"`
-     - To the <article id="original-post">:
-       - Add a <p> with `id="op-message"` for the message text.
-       - Add a <footer> with `id="op-footer"` for the metadata.
-     - To the <div> for the list of replies: `id="reply-list-container"`
-     - To the "Post a Reply" <form>: `id="reply-form"`
-
-  3. Implement the TODOs below.
+  NOTE: I added clear TODO labels and explanations so you know exactly
+  what each part is supposed to do.
 */
 
 // --- Global Data Store ---
-let currentTopicId = null;
-let currentReplies = []; // Will hold replies for *this* topic
+let currentTopicId = null;            // TODO: Will store topic ID from URL
+let currentReplies = [];              // TODO: Replies for this specific topic
 
 // --- Element Selections ---
-// TODO: Select all the elements you added IDs for in step 2.
+// TODO: Select HTML elements by their IDs from topic.html
+const topicSubject = document.getElementById("topic-subject"); // <h1>
+const opMessage = document.getElementById("op-message");       // OP message <p>
+const opFooter = document.getElementById("op-footer");         // OP footer <footer>
+const replyListContainer = document.getElementById("reply-list-container"); // Replies container
+const replyForm = document.getElementById("reply-form");       // Reply form
+const newReplyText = document.getElementById("new-reply-text"); // Textarea for new reply
 
-// --- Functions ---
 
 /**
- * TODO: Implement the getTopicIdFromURL function.
- * It should:
- * 1. Get the query string from `window.location.search`.
- * 2. Use the `URLSearchParams` object to get the value of the 'id' parameter.
- * 3. Return the id.
+ * TODO: Get topic ID from URL (?id=...) .
  */
 function getTopicIdFromURL() {
-  // ... your implementation here ...
+  const params = new URLSearchParams(window.location.search); // Read ?id=...
+  return params.get("id"); // return topic ID value
 }
 
+
 /**
- * TODO: Implement the renderOriginalPost function.
- * It takes one topic object.
- * It should:
- * 1. Set the `textContent` of `topicSubject` to the topic's subject.
- * 2. Set the `textContent` of `opMessage` to the topic's message.
- * 3. Set the `textContent` of `opFooter` to "Posted by: {author} on {date}".
- * 4. (Optional) Add a "Delete" button with `data-id="${topic.id}"` to the OP.
+ * TODO: Fill the original post section using topic data.
  */
 function renderOriginalPost(topic) {
-  // ... your implementation here ...
+  topicSubject.textContent = topic.subject;        // Set subject
+  opMessage.textContent = topic.message;           // Set message
+  opFooter.textContent = `Posted by: ${topic.author} on ${topic.date}`;
+
+  // Optional TODO: Add Delete button for OP
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Delete Topic";
+  deleteBtn.dataset.id = topic.id;
+  deleteBtn.classList.add("delete-topic-btn");
+  opFooter.appendChild(deleteBtn);
 }
 
+
 /**
- * TODO: Implement the createReplyArticle function.
- * It takes one reply object {id, author, date, text}.
- * It should return an <article> element matching the structure in `topic.html`.
- * - Include a <p> for the `text`.
- * - Include a <footer> for the `author` and `date`.
- * - Include a "Delete" button with class "delete-reply-btn" and `data-id="${id}"`.
+ * TODO: Create <article> element for a single reply.
  */
 function createReplyArticle(reply) {
-  // ... your implementation here ...
+  const article = document.createElement("article");
+  article.classList.add("reply");
+
+  const p = document.createElement("p");
+  p.textContent = reply.text; // reply text
+
+  const footer = document.createElement("footer");
+  footer.textContent = `${reply.author} — ${reply.date}`; // author + date
+
+  const delBtn = document.createElement("button"); // delete button
+  delBtn.textContent = "Delete";
+  delBtn.classList.add("delete-reply-btn");
+  delBtn.dataset.id = reply.id;
+
+  footer.appendChild(delBtn);
+  article.appendChild(p);
+  article.appendChild(footer);
+
+  return article;
 }
 
+
 /**
- * TODO: Implement the renderReplies function.
- * It should:
- * 1. Clear the `replyListContainer`.
- * 2. Loop through the global `currentReplies` array.
- * 3. For each reply, call `createReplyArticle()`, and
- * append the resulting <article> to `replyListContainer`.
+ * TODO: Show all replies for this topic.
  */
 function renderReplies() {
-  // ... your implementation here ...
+  replyListContainer.innerHTML = ""; // Clear old replies
+
+  currentReplies.forEach(reply => {
+    const replyEl = createReplyArticle(reply);
+    replyListContainer.appendChild(replyEl);
+  });
 }
 
+
 /**
- * TODO: Implement the handleAddReply function.
- * This is the event handler for the `replyForm` 'submit' event.
- * It should:
- * 1. Prevent the form's default submission.
- * 2. Get the text from `newReplyText.value`.
- * 3. If the text is empty, return.
- * 4. Create a new reply object:
- * {
- * id: `reply_${Date.now()}`,
- * author: 'Student' (hardcoded),
- * date: new Date().toISOString().split('T')[0],
- * text: (reply text value)
- * }
- * 5. Add this new reply to the global `currentReplies` array (in-memory only).
- * 6. Call `renderReplies()` to refresh the list.
- * 7. Clear the `newReplyText` textarea.
+ * TODO: Handle adding a reply from the form.
  */
 function handleAddReply(event) {
-  // ... your implementation here ...
+  event.preventDefault();
+
+  const text = newReplyText.value.trim(); // get textarea value
+  if (!text) return; // ignore empty reply
+
+  const newReply = {
+    id: `reply_${Date.now()}`,
+    author: "Student", // Hardcoded per requirements
+    date: new Date().toISOString().split("T")[0],
+    text: text,
+  };
+
+  currentReplies.push(newReply);  // Add to memory
+  renderReplies();                 // Refresh list
+  newReplyText.value = "";        // Clear textarea
 }
 
+
 /**
- * TODO: Implement the handleReplyListClick function.
- * This is an event listener on the `replyListContainer` (for delegation).
- * It should:
- * 1. Check if the clicked element (`event.target`) has the class "delete-reply-btn".
- * 2. If it does, get the `data-id` attribute from the button.
- * 3. Update the global `currentReplies` array by filtering out the reply
- * with the matching ID (in-memory only).
- * 4. Call `renderReplies()` to refresh the list.
+ * TODO: Handle delete button clicks (reply deletion).
  */
 function handleReplyListClick(event) {
-  // ... your implementation here ...
+  if (!event.target.classList.contains("delete-reply-btn")) return;
+
+  const idToDelete = event.target.dataset.id;
+  currentReplies = currentReplies.filter(r => r.id !== idToDelete);
+  renderReplies();
 }
 
+
 /**
- * TODO: Implement an `initializePage` function.
- * This function needs to be 'async'.
- * It should:
- * 1. Get the `currentTopicId` by calling `getTopicIdFromURL()`.
- * 2. If no ID is found, set `topicSubject.textContent = "Topic not found."` and stop.
- * 3. `fetch` both 'topics.json' and 'replies.json' (you can use `Promise.all`).
- * 4. Parse both JSON responses.
- * 5. Find the correct topic from the topics array using the `currentTopicId`.
- * 6. Get the correct replies array from the replies object using the `currentTopicId`.
- * Store this in the global `currentReplies` variable. (If no replies exist, use an empty array).
- * 7. If the topic is found:
- * - Call `renderOriginalPost()` with the topic object.
- * - Call `renderReplies()` to show the initial replies.
- * - Add the 'submit' event listener to `replyForm` (calls `handleAddReply`).
- * - Add the 'click' event listener to `replyListContainer` (calls `handleReplyListClick`).
- * 8. If the topic is not found, display an error in `topicSubject`.
+ * TODO: Load data, display OP and replies, and attach event listeners.
  */
 async function initializePage() {
-  // ... your implementation here ...
+  currentTopicId = getTopicIdFromURL(); // get ID from URL
+
+  if (!currentTopicId) {
+    topicSubject.textContent = "Topic not found.";
+    return;
+  }
+
+  // Fetch both JSON files
+  const [topicRes, replyRes] = await Promise.all([
+    fetch("topics.json"),
+    fetch("replies.json")
+  ]);
+
+  const topics = await topicRes.json();
+  const replies = await replyRes.json();
+
+  const topic = topics.find(t => t.id === currentTopicId);
+  currentReplies = replies[currentTopicId] || []; // load replies for topic
+
+  if (!topic) {
+    topicSubject.textContent = "Topic not found.";
+    return;
+  }
+
+  renderOriginalPost(topic);
+  renderReplies();
+
+  // Attach listeners
+  replyForm.addEventListener("submit", handleAddReply);
+  replyListContainer.addEventListener("click", handleReplyListClick);
 }
 
 // --- Initial Page Load ---
