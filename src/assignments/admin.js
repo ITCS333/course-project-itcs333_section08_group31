@@ -1,68 +1,54 @@
 /*
-  Requirement: Make the "Manage Resources" page interactive.
-
-  Instructions:
-  1. Link this file to `admin.html` using:
-     <script src="admin.js" defer></script>
-  
-  2. In `admin.html`, add an `id="resources-tbody"` to the <tbody> element
-     inside your `resources-table`.
-  
-  3. Implement the TODOs below.
+  Requirement: Make the "Manage Assignments" page interactive.
+  Structure matches src/resources/admin.js but connected to the PHP API.
 */
 
 // --- Global Data Store ---
-// This will hold the resources loaded from the JSON file.
-let resources = [];
+let assignments = [];
+const API_URL = "api/indexCourse_Resources.php";
 
 // --- Element Selections ---
-// TODO: Select the resource form ('#resource-form').
-const resourceForm = document.getElementById("resource-form");
-
-// TODO: Select the resources table body ('#resources-tbody').
-const resourcesTableBody = document.getElementById("resources-tbody");
+const assignmentForm = document.getElementById("assignment-form");
+const assignmentsTableBody = document.getElementById("assignments-tbody");
+const cancelBtn = document.getElementById("cancel-btn");
+const hiddenIdInput = document.getElementById("asg-id");
 
 // --- Functions ---
 
 /**
- * TODO: Implement the createResourceRow function.
- * It takes one resource object {id, title, description}.
- * It should return a <tr> element with the following <td>s:
- * 1. A <td> for the `title`.
- * 2. A <td> for the `description`.
- * 3. A <td> containing two buttons:
- * - An "Edit" button with class "edit-btn" and `data-id="${id}"`.
- * - A "Delete" button with class "delete-btn" and `data-id="${id}"`.
+ * Creates a table row for an assignment.
+ * Matches structure of createResourceRow in resources/admin.js
  */
-function createResourceRow(resource) {
-  // ... your implementation here ...
+function createAssignmentRow(assignment) {
   const tr = document.createElement("tr");
 
   // 1. Title cell
   const titleTd = document.createElement("td");
-  titleTd.textContent = resource.title;
+  titleTd.textContent = assignment.title;
   tr.appendChild(titleTd);
 
-  // 2. Description cell
-  const descTd = document.createElement("td");
-  descTd.textContent = resource.description || "";
-  tr.appendChild(descTd);
+  // 2. Due Date cell
+  const dateTd = document.createElement("td");
+  dateTd.textContent = assignment.due_date;
+  tr.appendChild(dateTd);
 
   // 3. Actions cell
   const actionsTd = document.createElement("td");
 
+  // Edit Button
   const editBtn = document.createElement("button");
   editBtn.type = "button";
   editBtn.textContent = "Edit";
   editBtn.className = "edit-btn";
-  editBtn.dataset.id = resource.id;
+  editBtn.dataset.id = assignment.id;
   actionsTd.appendChild(editBtn);
 
+  // Delete Button
   const deleteBtn = document.createElement("button");
   deleteBtn.type = "button";
   deleteBtn.textContent = "Delete";
   deleteBtn.className = "delete-btn";
-  deleteBtn.dataset.id = resource.id;
+  deleteBtn.dataset.id = assignment.id; // Use real database ID
   actionsTd.appendChild(deleteBtn);
 
   tr.appendChild(actionsTd);
@@ -71,150 +57,166 @@ function createResourceRow(resource) {
 }
 
 /**
- * TODO: Implement the renderTable function.
- * It should:
- * 1. Clear the `resourcesTableBody`.
- * 2. Loop through the global `resources` array.
- * 3. For each resource, call `createResourceRow()`, and
- * append the resulting <tr> to `resourcesTableBody`.
+ * Renders the table using the global assignments array.
+ * Matches renderTable in resources/admin.js
  */
 function renderTable() {
-  // ... your implementation here ...
-  if (!resourcesTableBody) return;
+  if (!assignmentsTableBody) return;
 
-  // 1. Clear current rows
-  resourcesTableBody.innerHTML = "";
+  assignmentsTableBody.innerHTML = "";
 
-  // 2 & 3. Loop and append
-  resources.forEach((resource) => {
-    const tr = createResourceRow(resource);
-    resourcesTableBody.appendChild(tr);
+  assignments.forEach((asg) => {
+    const tr = createAssignmentRow(asg);
+    assignmentsTableBody.appendChild(tr);
   });
 }
 
 /**
- * TODO: Implement the handleAddResource function.
- * This is the event handler for the form's 'submit' event.
- * It should:
- * 1. Prevent the form's default submission.
- * 2. Get the values from the title, description, and link inputs.
- * 3. Create a new resource object with a unique ID (e.g., `id: `res_${Date.now()}`).
- * 4. Add this new resource object to the global `resources` array (in-memory only).
- * 5. Call `renderTable()` to refresh the list.
- * 6. Reset the form.
+ * Handles Form Submission (Create or Update).
+ * Matches handleAddResource in resources/admin.js, but uses API.
  */
-function handleAddResource(event) {
-  // ... your implementation here ...
+async function handleSaveAssignment(event) {
   event.preventDefault();
 
-  if (!resourceForm) return;
+  const id = hiddenIdInput.value;
+  const title = document.getElementById("asg-title").value.trim();
+  const description = document.getElementById("asg-desc").value.trim();
+  const dueDate = document.getElementById("asg-due").value;
+  const filesText = document.getElementById("asg-files").value.trim();
+  
+  // Convert files text to array (split by new lines)
+  const filesArray = filesText ? filesText.split('\n').map(f => f.trim()).filter(f => f) : [];
 
-  const titleInput = document.getElementById("resource-title");
-  const descriptionInput = document.getElementById("resource-description");
-  const linkInput = document.getElementById("resource-link");
-
-  const title = (titleInput?.value || "").trim();
-  const description = (descriptionInput?.value || "").trim();
-  const link = (linkInput?.value || "").trim();
-
-  if (!title || !link) {
-    alert("Please provide at least a title and a valid link.");
+  if (!title || !dueDate) {
+    alert("Please provide a title and due date.");
     return;
   }
 
-  const newResource = {
-    id: `res_${Date.now()}`,
-    title,
-    description,
-    link,
+  const payload = {
+    id: id, // will be empty string if creating new
+    title: title,
+    description: description,
+    due_date: dueDate,
+    files: filesArray
   };
 
-  resources.push(newResource);
-  renderTable();
-  resourceForm.reset();
-}
-
-/**
- * TODO: Implement the handleTableClick function.
- * This is an event listener on the `resourcesTableBody` (for delegation).
- * It should:
- * 1. Check if the clicked element (`event.target`) has the class "delete-btn".
- * 2. If it does, get the `data-id` attribute from the button.
- * 3. Update the global `resources` array by filtering out the resource
- * with the matching ID (in-memory only).
- * 4. Call `renderTable()` to refresh the list.
- */
-function handleTableClick(event) {
-  // ... your implementation here ...
-  const target = event.target;
-
-  if (!(target instanceof HTMLElement)) return;
-
-  // Delete handler
-  if (target.classList.contains("delete-btn")) {
-    const id = target.dataset.id;
-    if (!id) return;
-
-    if (!confirm("Are you sure you want to delete this resource?")) {
-      return;
-    }
-
-    resources = resources.filter((res) => res.id !== id);
-    renderTable();
-  }
-
-  // (Optional) Edit logic can be added here later for .edit-btn
-}
-
-/**
- * TODO: Implement the loadAndInitialize function.
- * This function needs to be 'async'.
- * It should:
- * 1. Use `fetch()` to get data from 'resources.json'.
- * 2. Parse the JSON response and store the result in the global `resources` array.
- * 3. Call `renderTable()` to populate the table for the first time.
- * 4. Add the 'submit' event listener to `resourceForm` (calls `handleAddResource`).
- * 5. Add the 'click' event listener to `resourcesTableBody` (calls `handleTableClick`).
- */
-async function loadAndInitialize() {
-  // ... your implementation here ...
   try {
-    const response = await fetch("resources.json");
+    const method = id ? "PUT" : "POST";
+    const response = await fetch(API_URL, {
+      method: method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
-    if (!response.ok) {
-      console.error(
-        "Failed to load resources.json:",
-        response.status,
-        response.statusText
-      );
-      resources = [];
+    const result = await response.json();
+
+    if (result.success) {
+        // Reset form and reload data
+        resetForm();
+        loadAndInitialize(); 
     } else {
-      const data = await response.json().catch(() => null);
-      if (Array.isArray(data)) {
-        resources = data;
-      } else {
-        resources = [];
-      }
+        alert("Error: " + result.message);
     }
   } catch (error) {
-    console.error("Error fetching resources.json:", error);
-    resources = [];
+    console.error("Error saving assignment:", error);
+  }
+}
+
+/**
+ * Helper to reset form state
+ */
+function resetForm() {
+    assignmentForm.reset();
+    hiddenIdInput.value = "";
+    cancelBtn.style.display = "none";
+}
+
+/**
+ * Handles clicks on the table (Event Delegation).
+ * Matches handleTableClick in resources/admin.js
+ */
+async function handleTableClick(event) {
+  const target = event.target;
+  if (!(target instanceof HTMLElement)) return;
+
+  const id = target.dataset.id;
+  if (!id) return;
+
+  // DELETE ACTION
+  if (target.classList.contains("delete-btn")) {
+    if (!confirm("Are you sure you want to delete this assignment?")) return;
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: id })
+        });
+        
+        await loadAndInitialize(); // Refresh list
+    } catch (error) {
+        console.error("Error deleting assignment:", error);
+    }
   }
 
-  // 3. Initial render
-  renderTable();
+  // EDIT ACTION
+  if (target.classList.contains("edit-btn")) {
+    const assignment = assignments.find(a => a.id == id);
+    if (assignment) {
+        hiddenIdInput.value = assignment.id;
+        document.getElementById("asg-title").value = assignment.title;
+        document.getElementById("asg-desc").value = assignment.description;
+        document.getElementById("asg-due").value = assignment.due_date;
+        
+        // Convert files array back to text for editing
+        if (assignment.files && Array.isArray(assignment.files)) {
+            document.getElementById("asg-files").value = assignment.files.join('\n');
+        } else {
+            document.getElementById("asg-files").value = "";
+        }
 
-  // 4. Attach form listener
-  if (resourceForm) {
-    resourceForm.addEventListener("submit", handleAddResource);
+        cancelBtn.style.display = "inline-block";
+    }
   }
+}
 
-  // 5. Attach table click listener
-  if (resourcesTableBody) {
-    resourcesTableBody.addEventListener("click", handleTableClick);
+/**
+ * Loads data from API and initializes listeners.
+ * Matches loadAndInitialize in resources/admin.js
+ */
+async function loadAndInitialize() {
+  try {
+    const response = await fetch(API_URL);
+    const result = await response.json();
+
+    if (result.success && Array.isArray(result.data)) {
+      assignments = result.data;
+    } else {
+      assignments = [];
+    }
+    
+    renderTable();
+
+  } catch (error) {
+    console.error("Error fetching assignments:", error);
+    assignments = [];
+    renderTable();
   }
+}
+
+// --- Event Listeners ---
+// Initialize only if elements exist to prevent errors
+if (assignmentForm) {
+    assignmentForm.addEventListener("submit", handleSaveAssignment);
+}
+
+if (assignmentsTableBody) {
+    assignmentsTableBody.addEventListener("click", handleTableClick);
+}
+
+if (cancelBtn) {
+    cancelBtn.addEventListener("click", resetForm);
 }
 
 // --- Initial Page Load ---
-// Call the main async function to start the application.
 loadAndInitialize();
