@@ -21,4 +21,3 @@
 **Task 5:** Discussion - **Ahmed salman ahmed**
 
 ## A link to your live, hosted application on Replit.
-https://replit.com/@Maldoseri/ITCS333-Course-Project-31-sec-8?v=1
