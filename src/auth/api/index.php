@@ -183,6 +183,6 @@ catch(Exception $e){
      echo json_encode(['success' => false, 'message' => 'An internal server error occurred. Please try again later.']);
     // TODO: Exit the script
     exit;
-// --- End of Script -
+// --- End of Script ---
 }
 ?>
