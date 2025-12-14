@@ -46,6 +46,7 @@
 // Allow specific headers (Content-Type, Authorization)
 // Allow from any origin (adjust in production)
 session_start();
+$_SESSION['user_initialized'] = true;
 
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
