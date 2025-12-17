@@ -1,84 +1,19 @@
 /* ============================================
    Soft Dark / Light-Dark UI Theme
-   Elegant design inspired by Darkly + custom soft grey
+   Elegant design inspired by Darkly + soft grey
    ============================================ */
 
-/* Global page background */
-/* ============================================
-   Soft Dark / Light-Dark UI Theme
-   Elegant design inspired by Darkly + custom soft grey
-   ============================================ */
-
-/* Global page background */
+/* ---------- Global ---------- */
 body {
-    background: #1e1f21;         /* soft dark */
-    color: #f2f2f2;              /* light text */
+    background: #1e1f21;
+    color: #f2f2f2;
     font-family: "Segoe UI", Arial, sans-serif;
     margin: 0;
     padding: 0;
 }
 
-/* Header styling */
-header {
-    background: #0d6efd;          /* Bootstrap primary blue */
-    padding: 40px 20px;
-    text-align: center;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.4);
-}
-
-header h1 {
-    margin: 0;
-    font-size: 2.6rem;
-    color: white;
-    font-weight: 700;
-}
-
-/* Main container */
-main {
-    display: flex;
-    justify-content: center;
-    padding: 40px 15px;
-}
-
-/* Navigation card */
-nav {
-    width: 80%;
-    max-width: 900px;
-    background: #2b2d31;   /* darker card */
-    border-radius: 12px;
-    padding: 30px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.35);
-}
-
-/* Headings */
-nav h2 {
-    margin-bottom: 20px;
-    font-size: 1.8rem;
-    border-bottom: 2px solid #0d6efd;
-    padding-bottom: 10px;
-}
-
-nav h3 {
-    margin-top: 35px;
-    margin-bottom: 10px;
-    color: #b8b9bb;
-    font-weight: 600;
-}
-
-/* List styles */
-ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-li {
-    margin: 10px 0;
-}
-
-/* Links */
 a {
     color: #0d6efd;
-    font-size: 1.1rem;
     text-decoration: none;
     transition: 0.2s;
 }
@@ -87,6 +22,23 @@ a:hover {
     color: #72a7ff;
     text-decoration: underline;
 }
+
+/* ---------- Header ---------- */
+header {
+    background: #0d6efd;
+    padding: 40px 20px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.4);
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.4rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+/* Admin header (logout button layout) */
 .admin-header {
     display: flex;
     justify-content: space-between;
@@ -99,41 +51,184 @@ a:hover {
     cursor: pointer;
 }
 
-/* =========================
-   Task 2 – Course Resources
-   ========================= */
-
-/* 1) AdminView form: keep inputs/textarea neat and not too wide */
-#resource-form {
-  max-width: 600px;        /* form never wider than 600px */
-  margin: 0 auto 2rem;     /* center it */
+/* ---------- Main Layout ---------- */
+main {
+    padding: 40px 15px;
+    display: flex;
+    justify-content: center;
 }
 
-#resource-form label {
-  display: block;
-  margin-top: 0.75rem;
-  font-weight: 500;
+section {
+    width: 100%;
+    max-width: 1000px;
+    margin-bottom: 3rem;
 }
 
-#resource-form input[type="text"],
-#resource-form input[type="url"],
-#resource-form textarea {
-  width: 100%;             /* fill the form width, not the whole page */
-  box-sizing: border-box;  /* padding doesn’t increase width */
+/* ---------- Cards / Containers ---------- */
+nav,
+article,
+form,
+table {
+    background: #2b2d31;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.35);
 }
 
-/* Description textarea: limit height + only vertical resize */
-#resource-form textarea#resource-description {
-  min-height: 80px;
-  max-height: 200px;
-  resize: vertical;        /* user can only change height */
+/* ---------- Headings ---------- */
+h2 {
+    border-bottom: 2px solid #0d6efd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
 }
 
-/* 2) Description text in tables & resource cards  (AdminView, List, Details) */
-#resources-table td:nth-child(2),
-#resource-list-section p,
-#resource-description {
-  max-width: 60ch;         /* comfortable reading width */
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+h3 {
+    color: #b8b9bb;
+    margin-top: 25px;
+}
+
+/* ---------- Lists ---------- */
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+li {
+    margin: 10px 0;
+}
+
+/* ---------- Forms ---------- */
+form {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+fieldset {
+    border: none;
+    padding: 0;
+}
+
+label {
+    display: block;
+    margin-top: 12px;
+    font-weight: 500;
+}
+
+input,
+textarea,
+button {
+    width: 100%;
+    margin-top: 6px;
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+textarea {
+    resize: vertical;
+}
+
+button {
+    background: #0d6efd;
+    color: #fff;
+    font-weight: 600;
+    margin-top: 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0b5ed7;
+}
+
+/* ---------- Tables (Admin pages) ---------- */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #1f2226;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    vertical-align: top;
+}
+
+th {
+    color: #9dc3ff;
+}
+
+tbody tr {
+    border-bottom: 1px solid #3a3d42;
+}
+
+/* Action buttons */
+.edit-btn,
+.delete-btn {
+    width: auto;
+    padding: 6px 12px;
+    margin-right: 6px;
+}
+
+.delete-btn {
+    background: #dc3545;
+}
+
+.delete-btn:hover {
+    background: #bb2d3b;
+}
+
+/* ---------- Text Width Protection ---------- */
+td:nth-child(2),
+article p,
+#resource-description,
+#week-description {
+    max-width: 60ch;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* ---------- Discussion / Comments ---------- */
+#comment-list article,
+#comments-container article,
+.reply,
+.comment {
+    background: #23252a;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+}
+
+footer {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    color: #aaa;
+}
+
+/* ---------- Links Lists (files, weeks, resources) ---------- */
+article ul li a {
+    display: inline-block;
+    margin-top: 4px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.8rem;
+    }
+
+    main {
+        padding: 20px 10px;
+    }
+
+    table,
+    nav,
+    article {
+        padding: 18px;
+    }
 }
